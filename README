@@ -1,0 +1,4 @@
+LightSync is a simple utility tool that allows for automated data backup (e.g. on pendrive)
+
+The recipie.py file contains a working example of similar application found here:
+http://code.activestate.com/recipes/191017-backup-your-files/
