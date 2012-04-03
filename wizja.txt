@@ -1,1 +1,12 @@
-Wizja projketu LightSync
+Wizja projketu LightSync.
+
+Aplikcaja zostanie napisana w języku python. Będzie działała jako demon systemowy.
+
+Aplikację będzie można skonfigurować przez prosty plik konfiguracyjny, w którym podawać się będzie miejsce montowania dysków w danej dystrybucji, katalogi które chcemy aby były backupowane oraz wybór kompresji. Konfiguracja stworzy nam plik .lighsync który należy umieścić na dysku, który ma służyć do backupów.
+
+Po skonfigurowaniu i uruchomieniu aplikacja, będzie ona działała jako demon, sprawdzając co jakiś czas czy nie został zamontowany dysk. W przypadku pojawienia się nowego sprzętu, aplikacja będzie szukała na nim pliku .lightsync. Kiedy go wykryje, zostanie automatycznie wykonane wykrycie zmian w plikach i uaktualnienie backupu.
+
+Aplikacja będzie wyświetlać informację o aktualnym stanie jako dymek przy swojej ikonce w pasku aplikacji (tak jak np napiproject). Będą pojawiać się informację o wykryciu dysku, rozpoznaniu dysku jako dusky z backupami i końcu synchronizacji.
+
+
+
