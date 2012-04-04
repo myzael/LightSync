@@ -1,0 +1,36 @@
+-- VERSION_3
+-- START DISKCACHE
+/home/pita/Administracja/LightSync/.metadata/.plugins/org.eclipse.core.resources/.projects/Lightsync-core/com.python.pydev.analysis/v1_indexcache
+.v1_indexcache
+recipie|0|/home/pita/Administracja/LightSync/Lightsync-core/recipie.py
+main_app|0|/home/pita/Administracja/LightSync/Lightsync-core/main_app.py
+-- END DISKCACHE
+-- START DICTIONARY
+3
+3=MyEventHandler
+2=main_app
+1=recipie
+-- END DICTIONARY
+-- START TREE 1
+16
+abs|1|abspath!11@
+bac|3|backup!11@backup_files!10@backup_dir!11@
+bak|2|BAKFOLDER!11@bakfolder!11@
+des|1|destpath!11@
+eh|1|eh!19@
+fil|1|filepath!11@
+mai|1|main!18@
+max|1|MAXVERSIONS!11@
+mye|1|MyEventHandler!17@
+not|1|notifier!19@
+old|1|old_backup!11@
+par|1|parseConfig!18@
+rel|1|relpath!11@
+top|1|top_dir!11@
+tre|1|tree_top!11@
+wm|1|wm!19@
+-- END TREE
+-- START TREE 2
+1
+pro|1|process_IN_CREATE!3&18@
+-- END TREE

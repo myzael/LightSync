@@ -1,0 +1,41 @@
+'''
+Created on 04-04-2012
+
+@author: pita
+'''
+
+import pyinotify
+from os import path, listdir
+from time import sleep
+
+
+class MyEventHandler(pyinotify.ProcessEvent):
+
+    def process_IN_CREATE(self, event):
+        if path.isdir(event.pathname):
+            print "Mounted new dirve:", path.basename(event.pathname)
+            sleep(0.5)
+            l = [name for name in listdir(event.pathname) if name == '.lightsync']
+            i=0
+            while len(l) == 0 and i<5:
+                sleep(0.3)
+                l = [name for name in listdir(event.pathname)]
+                i+=1
+            print l
+            if len(l) == 1 :
+                print "Mounted drive is LightSync backup drive"
+            
+def main():
+    # watch manager
+    wm = pyinotify.WatchManager()
+    wm.add_watch('/media/', pyinotify.ALL_EVENTS, rec=False)
+
+    # event handler
+    eh = MyEventHandler()
+
+    # notifier
+    notifier = pyinotify.Notifier(wm, eh)
+    notifier.loop()
+
+if __name__ == '__main__':
+    main()
