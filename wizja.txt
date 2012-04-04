@@ -1,6 +1,6 @@
 Wizja projketu LightSync.
 
-Aplikcaja zostanie napisana w języku python. 
+Aplikacja zostanie napisana w języku python. 
 Będzie działała jako demon systemowy.
 
 Aplikację będzie można skonfigurować przez prosty plik konfiguracyjny, 
@@ -19,6 +19,8 @@ Aplikacja będzie wyświetlać informację o aktualnym stanie jako dymek
 przy swojej ikonce w pasku aplikacji (tak jak np napiproject). 
 Będą pojawiać się informację o wykryciu dysku, rozpoznaniu dysku 
 jako dysku z backupami i końcu synchronizacji.
+
+Do notyfikacji pojawienia sie dysku USB w katalogu montowania dyskow uzyjemy pyinotify.
 
 
 
