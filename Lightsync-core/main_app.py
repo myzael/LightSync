@@ -9,7 +9,7 @@ please use this as sudo python main_app
 import pyinotify
 from os import path, listdir
 from time import sleep
-from recipie import backup_files, restore_files
+from recipie import backup_files
 import sys
 
 
@@ -48,9 +48,13 @@ class MyEventHandler(pyinotify.ProcessEvent):
                         backup_files(bkup_f, path.join(event.pathname, 'LighSyncBackup'))
                     print 'backup complete...'
                 elif mode == 2:
-                    restore_path = raw_input('Enter path to restore backup:\n')
-                    for restr_f in listdir(path.join(event.pathname, 'LighSyncBackup')):
-                        backup_files(path.join(event.pathname, 'LighSyncBackup', restr_f), restore_path)
+                    restore_path = raw_input('Enter path to restore backup or type \"default\" to choose previous locations:\n')
+                    if restore_path == "default" : 
+                        for restr_f in parseConfig(path.join(event.pathname, l[0])):
+                            backup_files(path.join(event.pathname, 'LighSyncBackup', path.split(restr_f)[-1]), path.dirname(restr_f))
+                    else: 
+                        for restr_f in listdir(path.join(event.pathname, 'LighSyncBackup')):
+                            backup_files(path.join(event.pathname, 'LighSyncBackup', restr_f), restore_path)
                     print "Restoring files complete"
                 else:
                     print "wrong number"
