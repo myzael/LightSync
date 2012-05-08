@@ -42,20 +42,18 @@ class MyEventHandler(pyinotify.ProcessEvent):
                     mode = int(raw_input('Choose:\n1. Backup files\n2. Restore file\n'))
                 except ValueError:
                     print "Not a number"
-                    exit
                 if mode == 1:
                     # get list of catalogs to backup
                     for bkup_f in parseConfig(path.join(event.pathname, l[0])):
                         backup_files(bkup_f, path.join(event.pathname, 'LighSyncBackup'))
                     print 'backup complete...'
-                if mode == 2:
+                elif mode == 2:
                     restore_path = raw_input('Enter path to restore backup:\n')
                     for restr_f in listdir(path.join(event.pathname, 'LighSyncBackup')):
-                        restore_files(path.join(event.pathname, 'LighSyncBackup', restr_f), restore_path)
+                        backup_files(path.join(event.pathname, 'LighSyncBackup', restr_f), restore_path)
                     print "Restoring files complete"
                 else:
                     print "wrong number"
-                    exit
   
              
             
