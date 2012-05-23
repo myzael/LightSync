@@ -11,6 +11,7 @@ from os import path, listdir
 from time import sleep
 from recipie import backup_files
 import sys
+from PyQt4 import QtGui, QtCore
 
 
 def parseConfig(conf_path):
@@ -20,10 +21,13 @@ def parseConfig(conf_path):
 
 
 class MyEventHandler(pyinotify.ProcessEvent):
-
+    def __init__(self,icon):
+        pyinotify.ProcessEvent.__init__(self)
+        self.icon = icon
     def process_IN_CREATE(self, event):
         if path.isdir(event.pathname):
-            print "Mounted new dirve:", path.basename(event.pathname)
+            print "Mounted new drive:", path.basename(event.pathname)
+            self.icon.show_message("Mounted new drive:", str(path.basename(event.pathname)))
             
             # give mounted device time to mount
             sleep(0.5)
@@ -38,6 +42,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
             
             if len(l) == 1 :
                 print "Mounted drive is LightSync backup drive\n"
+                self.icon.show_message("Great!", "Mounted drive is LightSync backup drive")
                 try:
                     mode = int(raw_input('Choose:\n1. Backup files\n2. Restore file\n'))
                 except ValueError:
@@ -58,10 +63,28 @@ class MyEventHandler(pyinotify.ProcessEvent):
                     print "Restoring files complete"
                 else:
                     print "wrong number"
-  
-             
+
+
+class SystemTrayIcon(QtGui.QSystemTrayIcon):
+    def __init__(self, icon, parent=None):
+        QtGui.QSystemTrayIcon.__init__(self, icon, parent)
+        self.menu = QtGui.QMenu(parent)
+        exitAction = self.menu.addAction("Exit")
+        exitAction.triggered.connect(QtGui.qApp.quit)
+        self.setContextMenu(self.menu)
+        
+    def show_message(self,title,content):
+        QtCore.QTimer.singleShot(100, (lambda: self.showMessage(title,content)))
+    def show(self):
+        QtGui.QSystemTrayIcon.show(self)
+        self.show_message('Hello','This is LightSync')
             
 def main():
+    app = QtGui.QApplication(sys.argv)
+    style = app.style()
+    icon = QtGui.QIcon(style.standardPixmap(QtGui.QStyle.SP_DriveHDIcon))
+    trayIcon = SystemTrayIcon(icon)
+
     if len(sys.argv) == 2:
         with open(sys.argv[1]) as conf_file:
             for line in conf_file:
@@ -72,11 +95,27 @@ def main():
     wm.add_watch(MOUNT_DRIVE, pyinotify.ALL_EVENTS, rec=False)
 
     # event handler
-    eh = MyEventHandler()
+    eh = MyEventHandler(trayIcon)
 
     # notifier
-    notifier = pyinotify.Notifier(wm, eh)
-    notifier.loop()
+    notifier = pyinotify.Notifier(wm, eh,timeout=10)
+
+    # notifier.loop()
+    # notifier.run()
+
+    timer = QtCore.QTimer()
+    QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"), (lambda: quick_check(notifier)))
+    timer.start(100)
+
+    trayIcon.show()
+    sys.exit(app.exec_())
+
+def quick_check(notifier):
+    assert notifier._timeout is not None, 'Notifier must be constructed with a short timeout'
+    notifier.process_events()
+    while notifier.check_events():  #loop in case more events appear while we are processing
+        notifier.read_events()
+        notifier.process_events()
 
 if __name__ == '__main__':
     main()
