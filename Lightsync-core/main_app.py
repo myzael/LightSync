@@ -57,32 +57,93 @@ class MyEventHandler(pyinotify.ProcessEvent):
                 msgBox.addButton(btnR, QtGui.QMessageBox.NoRole)
                 btnC   = QtGui.QPushButton('Cancel')
                 msgBox.addButton(btnC, QtGui.QMessageBox.RejectRole)
-                msgBox.exec_();                
+                msgBox.exec_()                
 
             if msgBox.clickedButton() == btnB:
-                mode = 1
-            elif msgBox.clickedButton() == btnR:
-                mode = 2
-            else:
-                mode = 0
-
-            if mode == 1:
                 # get list of catalogs to backup
-
                 for bkup_f in parseConfig(path.join(event.pathname, l[0])):
                     backup_files(bkup_f, path.join(event.pathname, 'LighSyncBackup'))
                 print 'backup complete...'
                 self.icon.show_message('Completed','Backup complete!')
-            elif mode == 2:
-                #restore_path = raw_input('Enter path to restore backup or type \"default\" to choose previous locations:\n')
+
+            elif msgBox.clickedButton() == btnR:
+                msgBox2 = QtGui.QMessageBox()
+                msgBox2.setWindowTitle('Choose backup path')
+                msgBox2.setText('Do you want to choose the backup path or use the default one?')
+                btnC   = QtGui.QPushButton('Choose')
+                msgBox2.addButton(btnC, QtGui.QMessageBox.YesRole)
+                btnD   = QtGui.QPushButton('Default')
+                msgBox2.addButton(btnD, QtGui.QMessageBox.NoRole)
+                msgBox2.exec_()
+                
+                if msgBox2.clickedButton() == btnC:
+                    restore_path = str(QtGui.QFileDialog.getExistingDirectory(None,"Select Directory"))
+                dialog = QtGui.QDialog()
+                dialog.setWindowTitle("Things to restore")
+
+                grid = QtGui.QGridLayout()
+                grid.setSpacing(10)
+                    
+                listW = QtGui.QListWidget()
+                if msgBox2.clickedButton() == btnC:
+                    files = listdir(path.join(event.pathname, 'LighSyncBackup'))
+                elif msgBox2.clickedButton() == btnD:
+                    files = parseConfig(path.join(event.pathname, l[0]))
+                print files
+                for restr_f in files:
+                    item = QtGui.QListWidgetItem(restr_f)
+                    item.setCheckState(QtCore.Qt.Checked)
+                    listW.addItem(item)
+
+                ok = QtGui.QPushButton("Restore selected")
+
+                if msgBox2.clickedButton() == btnC:
+                    ok.clicked.connect(lambda: do_restore1(getCheckedItems(listW), dialog, event.pathname, restore_path))
+                elif msgBox2.clickedButton() == btnD:
+                    ok.clicked.connect(lambda: do_restore2(getCheckedItems(listW), dialog, event.pathname))
+
+                grid.addWidget(listW,0,0,4,7)
+                grid.addWidget(ok,5,3)
+
+                dialog.setLayout(grid)
+
+                dialog.resize(300,180)
+                dialog.exec_()
+                    
+                    #for restr_f in listdir(path.join(event.pathname, 'LighSyncBackup')):
+                        #backup_files(path.join(event.pathname, 'LighSyncBackup', restr_f), restore_path)
+                    
+                    #for restr_f in parseConfig(path.join(event.pathname, l[0])):
+                        #backup_files(path.join(event.pathname, 'LighSyncBackup', path.split(restr_f)[-1]), path.dirname(restr_f))
+
+#restore_path = raw_input('Enter path to restore backup or type \"default\" to choose previous locations:\n')
 #                    if restore_path == "default" : 
-                for restr_f in parseConfig(path.join(event.pathname, l[0])):
-                    backup_files(path.join(event.pathname, 'LighSyncBackup', path.split(restr_f)[-1]), path.dirname(restr_f))
+                #for restr_f in parseConfig(path.join(event.pathname, l[0])):
+               #     backup_files(path.join(event.pathname, 'LighSyncBackup', path.split(restr_f)[-1]), path.dirname(restr_f))
                 #else: 
-                   # for restr_f in listdir(path.join(event.pathname, 'LighSyncBackup')):
-                   #     backup_files(path.join(event.pathname, 'LighSyncBackup', restr_f), restore_path)
+        #            for restr_f in listdir(path.join(event.pathname, 'LighSyncBackup')):
+        #                backup_files(path.join(event.pathname, 'LighSyncBackup', restr_f), restore_path)
+
                 print "Restoring files complete"
                 self.icon.show_message('Completed','Restore complete!')
+
+def do_restore1(files,dialog,lPath,rPath):
+    for f in files:
+        print f
+        backup_files(path.join(lPath,'LighSyncBackup',f), rPath)
+    dialog.accept()
+
+def do_restore2(files,dialog,lPath):
+    for f in files:
+        print f
+        backup_files(path.join(lPath,'LighSyncBackup',path.split(f)[-1]), path.dirname(f))
+    dialog.accept()
+    
+
+def getCheckedItems(l):
+    for i in range(l.count()):
+        if l.item(i).checkState() == QtCore.Qt.Checked:
+            yield str(l.item(i).text())
 
 
 class SystemTrayIcon(QtGui.QSystemTrayIcon):
